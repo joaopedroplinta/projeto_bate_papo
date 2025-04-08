@@ -1,0 +1,64 @@
+syntax = "proto3";
+
+// Mensagem do servidor para o cliente
+message BCC_Dist_toServer {
+
+  enum CommandTypetoServer {
+    CMD_ID = 0; // minha identificação
+    CMD_LIST = 1; // lista usuários do servidor
+    CMD_SENDALL = 2; // envia para todos usuários
+    CMD_SENDONE = 3; // envia para um único usuário
+    CMD_SENDLIST = 4; // envia para vários usuários
+    CMD_DC = 5; // desconectar
+  }
+
+  CommandTypetoServer command = 1;  // Comando
+  string myname = 2;  // Nome do usuário (opcional)
+  repeated BCC_users receivers = 3;  // Lista de destinatários (para comando SENDONE, SENDLIST)
+  string message = 4; // Mensagem a ser enviada
+}
+
+// Mensagem do cliente para o servidor
+message BCC_Dist_toClient {
+  enum CommandTypetoClient {
+    CMD_LIST = 0; // lista usuários do servidor
+    CMD_MSG = 1; // mensagem
+    CMD_ERROR = 2; // erro do servidor
+  }
+
+  CommandTypetoClient command = 1;  // Comando
+  BCC_formatMessage message = 2; // Mensagem formatada
+  repeated BCC_users users = 3; // Lista de usuários online
+  string error_message = 4; // Mensagem de erro
+}
+
+// Definição de usuário
+message BCC_users {
+  string name = 1;  // Nome do usuário
+  string ip = 2;  // IP do usuário (opcional)
+}
+
+// Formato da mensagem que será enviada entre os usuários
+message BCC_formatMessage {
+  string receiver = 1; // Destinatário
+  string message = 2;  // Conteúdo da mensagem
+  string source = 3;   // Remetente (opcional)
+  int64 timestamp = 4; // Horário (timestamp) do envio da mensagem (opcional)
+}
+
+// Mensagem do servidor para o servidor
+message BCC_serToServ {
+  enum CommandTypetoServerToServer {
+    CMD_LIST = 0; // Atualização de usuários
+    CMD_MSG = 1;  // Envio de mensagem
+  }
+
+  CommandTypetoServerToServer command = 1;
+  repeated BCC_users users = 2; // Lista de usuários
+  BCC_formatMessage message = 3; // Mensagem (opcional)
+}
+
+// Mensagem de memória do servidor (armazenamento da lista de usuários)
+message BCC_memoriaServer {
+  repeated BCC_users lista = 1; // Lista de usuários no servidor
+}
